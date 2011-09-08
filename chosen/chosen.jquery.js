@@ -433,7 +433,7 @@
           this.results_hide();
         }
         this.search_field.val("");
-        this.form_field_jq.trigger("change");
+        this.form_field_jq.trigger("change", "chosen");
         return this.search_field_scale();
       }
     };
@@ -452,7 +452,7 @@
       result.removeClass("result-selected").addClass("active-result").show();
       this.result_clear_highlight();
       this.winnow_results();
-      this.form_field_jq.trigger("change");
+      this.form_field_jq.trigger("change", "chosen");
       return this.search_field_scale();
     };
     Chosen.prototype.results_search = function(evt) {

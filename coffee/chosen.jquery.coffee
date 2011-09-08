@@ -366,7 +366,7 @@ class Chosen
 
       @search_field.val ""
 
-      @form_field_jq.trigger "change"
+      @form_field_jq.trigger "change", "chosen"
       this.search_field_scale()
 
   result_activate: (el) ->
@@ -386,7 +386,7 @@ class Chosen
     this.result_clear_highlight()
     this.winnow_results()
 
-    @form_field_jq.trigger "change"
+    @form_field_jq.trigger "change", "chosen"
     this.search_field_scale()
 
   results_search: (evt) ->
