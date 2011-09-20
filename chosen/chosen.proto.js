@@ -1,7 +1,7 @@
 // Chosen, a Select Box Enhancer for jQuery and Protoype
 // by Patrick Filler for Harvest, http://getharvest.com
 // 
-// Version 0.9.1.GBS
+// Version 0.9.3.GBS
 // Slightly modified by Great Big Solutions, Ltd
 // Full source at https://github.com/greatbigsolutions/chosen
 // Copyright (c) 2011 Harvest http://getharvest.com
@@ -17,9 +17,10 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   root = this;
   Chosen = (function() {
-    function Chosen(elmn) {
+    function Chosen(form_field, options) {
+      this.form_field = form_field;
+      this.options = options != null ? options : {};
       this.set_default_values();
-      this.form_field = elmn;
       this.is_multiple = this.form_field.multiple;
       this.is_rtl = this.form_field.hasClassName("chzn-rtl");
       this.default_text_default = this.form_field.multiple ? "Select Some Options" : "Select an Option";
@@ -37,10 +38,11 @@
       this.result_highlighted = null;
       this.result_single_selected = null;
       this.choices = 0;
+      this.results_none_found = this.options.no_results_text || "No results match";
       this.single_temp = new Template('<a href="javascript:void(0)" class="chzn-single"><span>#{default}</span><div><b></b></div></a><div class="chzn-drop" style="left:-9000px;"><div class="chzn-search"><input type="text" autocomplete="off" /></div><ul class="chzn-results"></ul></div>');
       this.multi_temp = new Template('<ul class="chzn-choices"><li class="search-field"><input type="text" value="#{default}" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chzn-drop" style="left:-9000px;"><ul class="chzn-results"></ul></div>');
       this.choice_temp = new Template('<li class="search-choice" id="#{id}"><span>#{choice}</span><a href="javascript:void(0)" class="search-choice-close" rel="#{position}"></a></li>');
-      return this.no_results_temp = new Template('<li class="no-results">No results match "<span>#{terms}</span>"</li>');
+      return this.no_results_temp = new Template('<li class="no-results">' + this.results_none_found + ' "<span>#{terms}</span>"</li>');
     };
     Chosen.prototype.set_up_html = function() {
       var base_template, container_props, dd_top, dd_width, sf_width;
@@ -532,7 +534,7 @@
       var do_high;
       if (!this.result_highlight) {
         if (!this.is_multiple) {
-          do_high = this.search_results.down(".result-selected");
+          do_high = this.search_results.down(".result-selected.active-result");
         }
         if (!(do_high != null)) {
           do_high = this.search_results.down(".active-result");
@@ -700,19 +702,6 @@
       Prototype.BrowserFeatures['Version'] = new Number(RegExp.$1);
     }
   }
-  document.observe('dom:loaded', function(evt) {
-    var select, selects, _i, _len, _results;
-    if (Prototype.Browser.IE && (Prototype.BrowserFeatures['Version'] === 6 || Prototype.BrowserFeatures['Version'] === 7)) {
-      return;
-    }
-    selects = $$(".chzn-select");
-    _results = [];
-    for (_i = 0, _len = selects.length; _i < _len; _i++) {
-      select = selects[_i];
-      _results.push(new Chosen(select));
-    }
-    return _results;
-  });
   get_side_border_padding = function(elmt) {
     var layout, side_border_padding;
     layout = new Element.Layout(elmt);

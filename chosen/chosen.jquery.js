@@ -1,7 +1,7 @@
 // Chosen, a Select Box Enhancer for jQuery and Protoype
 // by Patrick Filler for Harvest, http://getharvest.com
 // 
-// Version 0.9.1.GBS
+// Version 0.9.3.GBS
 // Slightly modified by Great Big Solutions, Ltd
 // Full source at https://github.com/greatbigsolutions/chosen
 // Copyright (c) 2011 Harvest http://getharvest.com
@@ -18,21 +18,22 @@
   root = this;
   $ = jQuery;
   $.fn.extend({
-    chosen: function(data, options) {
+    chosen: function(options) {
       if ($.browser.msie && ($.browser.version === "6.0" || $.browser.version === "7.0")) {
         return this;
       }
       return $(this).each(function(input_field) {
         if (!($(this)).hasClass("chzn-done")) {
-          return new Chosen(this, data, options);
+          return new Chosen(this, options);
         }
       });
     }
   });
   Chosen = (function() {
-    function Chosen(elmn) {
+    function Chosen(form_field, options) {
+      this.form_field = form_field;
+      this.options = options != null ? options : {};
       this.set_default_values();
-      this.form_field = elmn;
       this.form_field_jq = $(this.form_field);
       this.is_multiple = this.form_field.multiple;
       this.is_rtl = this.form_field_jq.hasClass("chzn-rtl");
@@ -50,7 +51,8 @@
       this.results_showing = false;
       this.result_highlighted = null;
       this.result_single_selected = null;
-      return this.choices = 0;
+      this.choices = 0;
+      return this.results_none_found = this.options.no_results_text || "No results match";
     };
     Chosen.prototype.set_up_html = function() {
       var container_div, dd_top, dd_width, sf_width;
@@ -539,7 +541,7 @@
     Chosen.prototype.winnow_results_set_highlight = function() {
       var do_high, selected_results;
       if (!this.result_highlight) {
-        selected_results = !this.is_multiple ? this.search_results.find(".result-selected") : [];
+        selected_results = !this.is_multiple ? this.search_results.find(".result-selected.active-result") : [];
         do_high = selected_results.length ? selected_results.first() : this.search_results.find(".active-result").first();
         if (do_high != null) {
           return this.result_do_highlight(do_high);
@@ -548,7 +550,7 @@
     };
     Chosen.prototype.no_results = function(terms) {
       var no_results_html;
-      no_results_html = $('<li class="no-results">No results match "<span></span>"</li>');
+      no_results_html = $('<li class="no-results">' + this.results_none_found + ' "<span></span>"</li>');
       no_results_html.find("span").first().html(terms);
       return this.search_results.append(no_results_html);
     };

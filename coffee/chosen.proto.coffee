@@ -6,10 +6,10 @@ root = this
 
 class Chosen
 
-  constructor: (elmn) ->
+  constructor: (@form_field, @options={}) ->
+
     this.set_default_values()
     
-    @form_field = elmn
     @is_multiple = @form_field.multiple
     @is_rtl = @form_field.hasClassName "chzn-rtl"
 
@@ -30,11 +30,13 @@ class Chosen
     @result_single_selected = null
     @choices = 0
 
+    @results_none_found = @options.no_results_text or "No results match"
+
     # HTML Templates
     @single_temp = new Template('<a href="javascript:void(0)" class="chzn-single"><span>#{default}</span><div><b></b></div></a><div class="chzn-drop" style="left:-9000px;"><div class="chzn-search"><input type="text" autocomplete="off" /></div><ul class="chzn-results"></ul></div>')
     @multi_temp = new Template('<ul class="chzn-choices"><li class="search-field"><input type="text" value="#{default}" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chzn-drop" style="left:-9000px;"><ul class="chzn-results"></ul></div>')
     @choice_temp = new Template('<li class="search-choice" id="#{id}"><span>#{choice}</span><a href="javascript:void(0)" class="search-choice-close" rel="#{position}"></a></li>')
-    @no_results_temp = new Template('<li class="no-results">No results match "<span>#{terms}</span>"</li>')
+    @no_results_temp = new Template('<li class="no-results">' + @results_none_found + ' "<span>#{terms}</span>"</li>')
 
 
   set_up_html: ->
@@ -454,7 +456,7 @@ class Chosen
     if not @result_highlight
 
       if not @is_multiple
-        do_high = @search_results.down(".result-selected")
+        do_high = @search_results.down(".result-selected.active-result")
 
       if not do_high?
         do_high = @search_results.down(".active-result")
@@ -579,13 +581,6 @@ if Prototype.Browser.IE
   if /MSIE (\d+\.\d+);/.test(navigator.userAgent)
     Prototype.BrowserFeatures['Version'] = new Number(RegExp.$1);
 
-
-document.observe 'dom:loaded', (evt) ->
-  # Do no harm and return as soon as possible for unsupported browsers, namely IE6 and IE7
-  return if Prototype.Browser.IE and (Prototype.BrowserFeatures['Version'] is 6 or Prototype.BrowserFeatures['Version'] is 7)
-  
-  selects = $$(".chzn-select")
-  new Chosen select for select in selects
 
 get_side_border_padding = (elmt) ->
   layout = new Element.Layout(elmt)
