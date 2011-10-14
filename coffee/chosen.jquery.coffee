@@ -173,6 +173,8 @@ class Chosen extends AbstractChosen
     else if not @is_multiple
       @selected_item.find("span").text @default_text
 
+    @selected_item.find("abbr").remove()
+
     content = ''
     for data in @results_data
       if data.group

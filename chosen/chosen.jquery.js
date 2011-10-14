@@ -453,6 +453,7 @@
       } else if (!this.is_multiple) {
         this.selected_item.find("span").text(this.default_text);
       }
+      this.selected_item.find("abbr").remove();
       content = '';
       _ref = this.results_data;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
