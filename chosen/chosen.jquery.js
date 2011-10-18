@@ -343,7 +343,7 @@
         return this.results_update_field(evt);
       }, this));
       this.form_field_jq.focus(__bind(function(evt) {
-        return this.input_focus(evt);
+        return this.selected_item.focus();
       }, this));
       this.search_field.blur(__bind(function(evt) {
         return this.input_blur(evt);

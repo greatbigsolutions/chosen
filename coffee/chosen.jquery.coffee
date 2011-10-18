@@ -82,7 +82,7 @@ class Chosen extends AbstractChosen
     @search_results.mouseout (evt) => this.search_results_mouseout(evt)
 
     @form_field_jq.bind "liszt:updated", (evt) => this.results_update_field(evt)
-    @form_field_jq.focus (evt) => this.input_focus(evt)
+    @form_field_jq.focus (evt) => @selected_item.focus()
 
     @search_field.blur (evt) => this.input_blur(evt)
     @search_field.keyup (evt) => this.keyup_checker(evt)
