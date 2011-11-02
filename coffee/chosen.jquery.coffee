@@ -172,6 +172,7 @@ class Chosen extends AbstractChosen
       @choices = 0
     else if not @is_multiple
       @selected_item.find("span").text @default_text
+      @selected_item.find("abbr").remove()
       if @form_field.options.length <= @disable_search_threshold
         @container.addClass "chzn-container-single-nosearch"
       else
