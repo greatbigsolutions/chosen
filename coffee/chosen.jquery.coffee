@@ -44,7 +44,6 @@ class Chosen extends AbstractChosen
     @form_field_jq.hide().after container_div
     @container = ($ '#' + @container_id)
     @container.addClass( "chzn-container-" + (if @is_multiple then "multi" else "single") )
-    @container.addClass "chzn-container-single-nosearch" if not @is_multiple and @form_field.options.length <= @disable_search_threshold
     @dropdown = @container.find('div.chzn-drop').first()
     
     dd_top = @container.height()
@@ -69,7 +68,7 @@ class Chosen extends AbstractChosen
     
     this.results_build()
     this.set_tab_index()
-
+    @form_field_jq.trigger("liszt:ready", {chosen: this})
 
   register_observers: ->
     @container.mousedown (evt) => this.container_mousedown(evt)
@@ -93,15 +92,15 @@ class Chosen extends AbstractChosen
       @search_field.focus (evt) => this.input_focus(evt)
 
   search_field_disabled: ->
-    @is_disabled = @form_field_jq.attr 'disabled'
+    @is_disabled = @form_field_jq[0].disabled
     if(@is_disabled)
       @container.addClass 'chzn-disabled'
-      @search_field.attr 'disabled', true
+      @search_field[0].disabled = true
       @selected_item.unbind "focus", @activate_action if !@is_multiple
       this.close_field()
     else
       @container.removeClass 'chzn-disabled'
-      @search_field.attr 'disabled', false
+      @search_field[0].disabled = false
       @selected_item.bind "focus", @activate_action if !@is_multiple
 
   container_mousedown: (evt) ->
@@ -173,8 +172,10 @@ class Chosen extends AbstractChosen
       @choices = 0
     else if not @is_multiple
       @selected_item.find("span").text @default_text
-
-    @selected_item.find("abbr").remove()
+      if @form_field.options.length <= @disable_search_threshold
+        @container.addClass "chzn-container-single-nosearch"
+      else
+        @container.removeClass "chzn-container-single-nosearch"
 
     content = ''
     for data in @results_data
@@ -186,7 +187,7 @@ class Chosen extends AbstractChosen
           this.choice_build data
         else if data.selected and not @is_multiple
           @selected_item.find("span").text data.text
-          @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect
+          this.single_deselect_control_build() if @allow_single_deselect
 
     this.search_field_disabled()
     this.show_search_field_default()
@@ -343,8 +344,8 @@ class Chosen extends AbstractChosen
         this.choice_build item
       else
         @selected_item.find("span").first().text item.text
-        @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect
-
+        this.single_deselect_control_build() if @allow_single_deselect
+      
       this.results_hide() unless evt.metaKey and @is_multiple
 
       @search_field.val ""
@@ -371,6 +372,9 @@ class Chosen extends AbstractChosen
 
     @form_field_jq.trigger "change", "chosen"
     this.search_field_scale()
+
+  single_deselect_control_build: ->
+    @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect and @selected_item.find("abbr").length < 1
 
   winnow_results: ->
     startTime = new Date()

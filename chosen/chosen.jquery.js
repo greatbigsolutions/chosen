@@ -289,9 +289,6 @@
       this.form_field_jq.hide().after(container_div);
       this.container = $('#' + this.container_id);
       this.container.addClass("chzn-container-" + (this.is_multiple ? "multi" : "single"));
-      if (!this.is_multiple && this.form_field.options.length <= this.disable_search_threshold) {
-        this.container.addClass("chzn-container-single-nosearch");
-      }
       this.dropdown = this.container.find('div.chzn-drop').first();
       dd_top = this.container.height();
       dd_width = this.f_width - get_side_border_padding(this.dropdown);
@@ -315,7 +312,10 @@
         });
       }
       this.results_build();
-      return this.set_tab_index();
+      this.set_tab_index();
+      return this.form_field_jq.trigger("liszt:ready", {
+        chosen: this
+      });
     };
     Chosen.prototype.register_observers = function() {
       this.container.mousedown(__bind(function(evt) {
@@ -364,17 +364,17 @@
       }
     };
     Chosen.prototype.search_field_disabled = function() {
-      this.is_disabled = this.form_field_jq.attr('disabled');
+      this.is_disabled = this.form_field_jq[0].disabled;
       if (this.is_disabled) {
         this.container.addClass('chzn-disabled');
-        this.search_field.attr('disabled', true);
+        this.search_field[0].disabled = true;
         if (!this.is_multiple) {
           this.selected_item.unbind("focus", this.activate_action);
         }
         return this.close_field();
       } else {
         this.container.removeClass('chzn-disabled');
-        this.search_field.attr('disabled', false);
+        this.search_field[0].disabled = false;
         if (!this.is_multiple) {
           return this.selected_item.bind("focus", this.activate_action);
         }
@@ -455,8 +455,12 @@
         this.choices = 0;
       } else if (!this.is_multiple) {
         this.selected_item.find("span").text(this.default_text);
+        if (this.form_field.options.length <= this.disable_search_threshold) {
+          this.container.addClass("chzn-container-single-nosearch");
+        } else {
+          this.container.removeClass("chzn-container-single-nosearch");
+        }
       }
-      this.selected_item.find("abbr").remove();
       content = '';
       _ref = this.results_data;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -470,7 +474,7 @@
           } else if (data.selected && !this.is_multiple) {
             this.selected_item.find("span").text(data.text);
             if (this.allow_single_deselect) {
-              this.selected_item.find("span").first().after("<abbr class=\"search-choice-close\"></abbr>");
+              this.single_deselect_control_build();
             }
           }
         }
@@ -649,7 +653,7 @@
         } else {
           this.selected_item.find("span").first().text(item.text);
           if (this.allow_single_deselect) {
-            this.selected_item.find("span").first().after("<abbr class=\"search-choice-close\"></abbr>");
+            this.single_deselect_control_build();
           }
         }
         if (!(evt.metaKey && this.is_multiple)) {
@@ -677,6 +681,11 @@
       this.winnow_results();
       this.form_field_jq.trigger("change", "chosen");
       return this.search_field_scale();
+    };
+    Chosen.prototype.single_deselect_control_build = function() {
+      if (this.allow_single_deselect && this.selected_item.find("abbr").length < 1) {
+        return this.selected_item.find("span").first().after("<abbr class=\"search-choice-close\"></abbr>");
+      }
     };
     Chosen.prototype.winnow_results = function() {
       var found, option, part, parts, regex, result_id, results, searchText, startTime, startpos, text, zregex, _i, _j, _len, _len2, _ref;

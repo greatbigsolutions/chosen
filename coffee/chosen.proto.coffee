@@ -38,7 +38,6 @@ class Chosen extends AbstractChosen
     @form_field.hide().insert({ after: base_template })
     @container = $(@container_id)
     @container.addClassName( "chzn-container-" + (if @is_multiple then "multi" else "single") )
-    @container.addClassName "chzn-container-single-nosearch" if not @is_multiple and @form_field.options.length <= @disable_search_threshold
     @dropdown = @container.down('div.chzn-drop')
     
     dd_top = @container.getHeight()
@@ -63,6 +62,7 @@ class Chosen extends AbstractChosen
     
     this.results_build()
     this.set_tab_index()
+    @form_field.fire("liszt:ready", {chosen: this})
 
   register_observers: ->
     @container.observe "mousedown", (evt) => this.container_mousedown(evt)
@@ -164,6 +164,10 @@ class Chosen extends AbstractChosen
       @choices = 0
     else if not @is_multiple
       @selected_item.down("span").update(@default_text)
+      if @form_field.options.length <= @disable_search_threshold
+        @container.addClassName "chzn-container-single-nosearch"
+      else
+        @container.removeClassName "chzn-container-single-nosearch"
 
     content = ''
     for data in @results_data
@@ -175,7 +179,7 @@ class Chosen extends AbstractChosen
           this.choice_build data
         else if data.selected and not @is_multiple
           @selected_item.down("span").update( data.html )
-          @selected_item.down("span").insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect
+          this.single_deselect_control_build() if @allow_single_deselect
 
     this.search_field_disabled()
     this.show_search_field_default()
@@ -331,7 +335,7 @@ class Chosen extends AbstractChosen
         this.choice_build item
       else
         @selected_item.down("span").update(item.html)
-        @selected_item.down("span").insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect
+        this.single_deselect_control_build() if @allow_single_deselect
 
       this.results_hide() unless evt.metaKey and @is_multiple
 
@@ -359,6 +363,9 @@ class Chosen extends AbstractChosen
 
     @form_field.simulate("change") if typeof Event.simulate is 'function'
     this.search_field_scale()
+    
+  single_deselect_control_build: ->
+    @selected_item.down("span").insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect and not @selected_item.down("abbr")
 
   winnow_results: ->
     startTime = new Date()
@@ -487,16 +494,21 @@ class Chosen extends AbstractChosen
     switch stroke
       when 8
         @backstroke_length = this.search_field.value.length
+        break
       when 9
         this.result_select(evt) if this.results_showing and not @is_multiple
         @mouse_on_container = false
+        break
       when 13
         evt.preventDefault()
+        break
       when 38
         evt.preventDefault()
         this.keyup_arrow()
+        break
       when 40
         this.keydown_arrow()
+        break
 
   search_field_scale: ->
     if @is_multiple
