@@ -155,7 +155,6 @@ class Chosen extends AbstractChosen
       this.close_field()
 
   results_build: ->
-    startTime = new Date()
     @parsing = true
     @results_data = root.SelectParser.select_to_array @form_field
 
@@ -368,7 +367,6 @@ class Chosen extends AbstractChosen
     @selected_item.down("span").insert { after: "<abbr class=\"search-choice-close\"></abbr>" } if @allow_single_deselect and not @selected_item.down("abbr")
 
   winnow_results: ->
-    startTime = new Date()
     this.no_results_clear()
 
     results = 0
@@ -409,7 +407,7 @@ class Chosen extends AbstractChosen
 
             this.result_activate $(result_id)
 
-            $(@results_data[option.group_array_index].dom_id).show() if option.group_array_index?
+            $(@results_data[option.group_array_index].dom_id).setStyle({display: 'list-item'}) if option.group_array_index?
           else
             this.result_clear_highlight() if $(result_id) is @result_highlight
             this.result_deactivate $(result_id)
