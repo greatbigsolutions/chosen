@@ -429,8 +429,10 @@
       return this.search_field_scale();
     };
     Chosen.prototype.activate_field = function() {
-      if (!this.is_multiple && !this.active_field) {
-        this.search_field.attr("tabindex", this.selected_item.attr("tabindex"));
+      var tabindex;
+      tabindex = Number(this.selected_item.attr("tabindex"));
+      if (!this.is_multiple && !this.active_field && tabindex !== -1) {
+        this.search_field.attr("tabindex", tabindex);
         this.selected_item.attr("tabindex", -1);
       }
       this.container.addClass("chzn-container-active");
