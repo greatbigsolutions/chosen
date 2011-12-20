@@ -248,14 +248,23 @@
   $ = jQuery;
   $.fn.extend({
     chosen: function(options) {
-      if ($.browser.msie && ($.browser.version === "6.0" || $.browser.version === "7.0")) {
+      var zIndexNumber;
+      if ($.browser.msie && $.browser.version === "6.0") {
         return this;
       }
-      return $(this).each(function(input_field) {
+      $(this).each(function(input_field) {
         if (!($(this)).hasClass("chzn-done")) {
           return new Chosen(this, options);
         }
       });
+      if ($.browser.msie && $.browser.version === "7.0") {
+        zIndexNumber = 900;
+        $('.chzn-container').each(function() {
+          $(this).css('zIndex', zIndexNumber);
+          return zIndexNumber -= 1;
+        });
+      }
+      return this;
     }
   });
   Chosen = (function() {

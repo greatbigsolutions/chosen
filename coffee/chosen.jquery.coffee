@@ -7,10 +7,16 @@ $ = jQuery
 
 $.fn.extend({
   chosen: (options) ->
-    return this if $.browser.msie and ($.browser.version is "6.0" or  $.browser.version is "7.0")
+    return this if $.browser.msie and $.browser.version is "6.0"
     $(this).each((input_field) ->
       new Chosen(this, options) unless ($ this).hasClass "chzn-done"
     )
+    if $.browser.msie and $.browser.version is "7.0"
+      zIndexNumber = 900
+      $('.chzn-container').each ->
+        $(this).css('zIndex', zIndexNumber)
+        zIndexNumber -= 1
+    this
 })
 
 class Chosen extends AbstractChosen
