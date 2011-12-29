@@ -439,10 +439,12 @@
     };
     Chosen.prototype.activate_field = function() {
       var tabindex;
-      tabindex = Number(this.selected_item.attr("tabindex"));
-      if (!this.is_multiple && !this.active_field && tabindex !== -1) {
-        this.search_field.attr("tabindex", tabindex);
-        this.selected_item.attr("tabindex", -1);
+      if (!this.is_multiple && !this.active_field) {
+        tabindex = Number(this.selected_item.attr("tabindex"));
+        if (tabindex !== -1) {
+          this.search_field.attr("tabindex", tabindex);
+          this.selected_item.attr("tabindex", -1);
+        }
       }
       this.container.addClass("chzn-container-active");
       this.active_field = true;

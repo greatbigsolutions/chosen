@@ -151,17 +151,17 @@ class Chosen extends AbstractChosen
     this.search_field_scale()
 
   activate_field: ->
-    tabindex = (Number) (@selected_item.attr "tabindex")
-    if not @is_multiple and not @active_field and tabindex != -1
-      @search_field.attr "tabindex", tabindex
-      @selected_item.attr "tabindex", -1
+    if not @is_multiple and not @active_field
+      tabindex = (Number) (@selected_item.attr "tabindex")
+      if tabindex != -1
+        @search_field.attr "tabindex", tabindex
+        @selected_item.attr "tabindex", -1
 
     @container.addClass "chzn-container-active"
     @active_field = true
 
     @search_field.val(@search_field.val())
     @search_field.focus()
-
 
   test_active_click: (evt) ->
     if $(evt.target).parents('#' + @container_id).length
